@@ -1,9 +1,38 @@
+apiVersion: ingress.oraclecloud.com/v1beta1
+kind: IngressClassParameters
+metadata:
+  name: hello-ic-params
+  namespace: default
+spec:
+  compartmentId: "ocid1.compartment.oc1..aaaaaaaa5wz5sjhw2wlpzj5bzjybgcbzrccsh6afijjrttcm4lc7r6qninra"
+  subnetId: "ocid1.subnet.oc1.ap-singapore-1.aaaaaaaayejgnnnbnry5zorbqkxxvz7v7umdxrezl67e2kex3n446pqgwyaa"
+  loadBalancerName: "hello-lb"
+  isPrivate: true
+  maxBandwidthMbps: 100
+  minBandwidthMbps: 100
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: hello-ic-ingress-class
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: oci.oraclecloud.com/native-ingress-controller
+  parameters:
+    scope: Namespace
+    namespace: default
+    apiGroup: ingress.oraclecloud.com
+    kind: ingressclassparameters
+    name: hello-ic-params
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hello-world-ingress
+  namespace: default
 spec:
-  ingressClassName: nginx
+  ingressClassName: hello-ic-ingress-class
   rules:
     -  http:
         paths:
